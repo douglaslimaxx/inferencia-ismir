@@ -36,10 +36,13 @@ dados_wide = dados %>%
 dados_wide = dados_wide %>% 
     mutate(
         combined_baseline = combined - baseline, 
-        updown_baseline = `up/downvoting` - baseline
+        updown_baseline = `up/downvoting` - baseline,
+        skip_baseline = skip - baseline,
+        updown_combined = `up/downvoting` - combined,
+        combined_skip = combined - skip,
+        updown_skip = `up/downvoting` - skip
     ) 
 ```
-
 
 
 ```{r}
@@ -54,6 +57,23 @@ theta(dados_wide$updown_baseline, 1:NROW(dados_wide))
 ```
 
 ```{r}
+THETA_A = theta(dados$satisfaction, 1:NROW(dados))
+
+THETA_A
+```
+
+
+```{r}
+dados %>%
+  ggplot(aes(satisfaction)) +
+  geom_histogram(binwidth = .5,
+                 fill = "white",
+                 colour = "darkgrey") +
+  geom_vline(xintercept = THETA_A, linetype = "dashed") + 
+  labs(title = "Distribuição amostral")
+```
+
+```{r}
 ci_combined = boot(data = dados_wide$combined_baseline,
                    statistic = theta,
                    R = 2000) %>%
@@ -62,7 +82,54 @@ ci_combined = boot(data = dados_wide$combined_baseline,
          conf.int = TRUE)
 
 ci_combined
+```
+```{r}
+ci_combined %>% 
+  ggplot(aes(
+            ymin = conf.low,
+            y = statistic,
+            ymax = conf.high,
+            x = "Combined - Baseline"
+        )) +
+        geom_linerange() +
+        geom_point(color = "coral", size = 2) +
+        scale_y_continuous(limits = c(0, 5)) +
+        labs(x = "", y = "Média da diferenças de satisfação") +
+        coord_flip()
+```
 
+Com 95% de confiança a estratégia combined pode ter maior satisfação em relação à estratégia baseline, com uma diferença média de 2 e com um margem de erro 0.5 para mais e para menos.
+
+```{r}
+ci_skip = boot(data = dados_wide$skip_baseline,
+                   statistic = theta,
+                   R = 2000) %>%
+    tidy(conf.level = .99,
+         conf.method = "bca",
+         conf.int = TRUE)
+
+ci_skip
+```
+
+
+```{r}
+ci_skip %>% 
+  ggplot(aes(
+            ymin = conf.low,
+            y = statistic,
+            ymax = conf.high,
+            x = "Skip - Baseline"
+        )) +
+        geom_linerange() +
+        geom_point(color = "coral", size = 2) +
+        scale_y_continuous(limits = c(0, 5)) +
+        labs(x = "", y = "Média da diferenças de satisfação") +
+        coord_flip()
+```
+
+Com 99% de confiança a estratégia skip tem chance de ter maior satisfação em relação à estratégia baseline, com uma diferença média de 0.5, mas com uma margem de erro de aproximadamente 0.5 para mais ou para menos, a diferença entre as duas estratégia pode não existir.
+
+```{r}
 ci_updown = boot(data = dados_wide$updown_baseline,
                    statistic = theta,
                    R = 2000) %>%
@@ -73,3 +140,130 @@ ci_updown = boot(data = dados_wide$updown_baseline,
 ci_updown
 ```
 
+
+```{r}
+ci_updown %>% 
+  ggplot(aes(
+            ymin = conf.low,
+            y = statistic,
+            ymax = conf.high,
+            x = "Up/downvoting - Baseline"
+        )) +
+        geom_linerange() +
+        geom_point(color = "coral", size = 2) +
+        scale_y_continuous(limits = c(0, 5)) +
+        labs(x = "", y = "Média da diferenças de satisfação") +
+        coord_flip()
+```
+
+Com 95% de confiança a estratégia up/downvotings pode ter maior satisfação em relação à estratégia baseline, com uma diferença média de 2.25 e com um margem de erro de aproximadamente 0.3 para mais e para menos.
+
+```{r}
+ci_updown_combined = boot(data = dados_wide$updown_combined,
+                   statistic = theta,
+                   R = 2000) %>%
+    tidy(conf.level = .95,
+         conf.method = "bca",
+         conf.int = TRUE)
+
+ci_updown_combined
+```
+
+
+```{r}
+ci_updown_combined %>% 
+  ggplot(aes(
+            ymin = conf.low,
+            y = statistic,
+            ymax = conf.high,
+            x = "Up/downvoting - Combined"
+        )) +
+        geom_linerange() +
+        geom_point(color = "coral", size = 2) +
+        scale_y_continuous(limits = c(0, 5)) +
+        labs(x = "", y = "Média da diferenças de satisfação") +
+        coord_flip()
+```
+
+```{r}
+ci_updown = boot(data = dados_wide$updown_baseline,
+                   statistic = theta,
+                   R = 2000) %>%
+    tidy(conf.level = .95,
+         conf.method = "bca",
+         conf.int = TRUE)
+
+ci_updown
+```
+
+
+```{r}
+ci_updown %>% 
+  ggplot(aes(
+            ymin = conf.low,
+            y = statistic,
+            ymax = conf.high,
+            x = "Up/downvoting - Baseline"
+        )) +
+        geom_linerange() +
+        geom_point(color = "coral", size = 2) +
+        scale_y_continuous(limits = c(0, 5)) +
+        labs(x = "", y = "Média da diferenças de satisfação") +
+        coord_flip()
+```
+
+Com 95% de confiança a estratégia up/downvotings pode ter maior satisfação em relação à estratégia baseline, com uma diferença média de 2.25 e com um margem de erro de aproximadamente 0.3 para mais e para menos.
+
+```{r}
+ci_skip_combined = boot(data = dados_wide$combined_skip,
+                   statistic = theta,
+                   R = 2000) %>%
+    tidy(conf.level = .95,
+         conf.method = "bca",
+         conf.int = TRUE)
+
+ci_skip_combined
+```
+
+
+```{r}
+ci_skip_combined %>% 
+  ggplot(aes(
+            ymin = conf.low,
+            y = statistic,
+            ymax = conf.high,
+            x = "Skip - Combined"
+        )) +
+        geom_linerange() +
+        geom_point(color = "coral", size = 2) +
+        scale_y_continuous(limits = c(0, 5)) +
+        labs(x = "", y = "Média da diferenças de satisfação") +
+        coord_flip()
+```
+
+```{r}
+ci_skip_updown = boot(data = dados_wide$updown_skip,
+                   statistic = theta,
+                   R = 2000) %>%
+    tidy(conf.level = .95,
+         conf.method = "bca",
+         conf.int = TRUE)
+
+ci_skip_updown
+```
+
+
+```{r}
+ci_skip_updown %>% 
+  ggplot(aes(
+            ymin = conf.low,
+            y = statistic,
+            ymax = conf.high,
+            x = "Skip - Combined"
+        )) +
+        geom_linerange() +
+        geom_point(color = "coral", size = 2) +
+        scale_y_continuous(limits = c(0, 5)) +
+        labs(x = "", y = "Média da diferenças de satisfação") +
+        coord_flip()
+```
