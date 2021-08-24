@@ -83,6 +83,7 @@ ci_combined = boot(data = dados_wide$combined_baseline,
 
 ci_combined
 ```
+
 ```{r}
 ci_combined %>% 
   ggplot(aes(
@@ -98,7 +99,7 @@ ci_combined %>%
         coord_flip()
 ```
 
-Com 95% de confiança a estratégia combined pode ter maior satisfação em relação à estratégia baseline, com uma diferença média de 2 e com um margem de erro 0.5 para mais e para menos.
+No intervalo de 95% de confiança a estratégia Combined tem maior satisfação do que a estratégia Baseline, com uma diferença média de 2 pontos e com um margem de erro de 0.5 para mais ou para menos.
 
 ```{r}
 ci_skip = boot(data = dados_wide$skip_baseline,
@@ -127,7 +128,7 @@ ci_skip %>%
         coord_flip()
 ```
 
-Com 99% de confiança a estratégia skip tem chance de ter maior satisfação em relação à estratégia baseline, com uma diferença média de 0.5, mas com uma margem de erro de aproximadamente 0.5 para mais ou para menos, a diferença entre as duas estratégia pode não existir.
+Num intervalo de 99% de confiança a estratégia Skip tem chance de ter maior satisfação em relação à estratégia Baseline, com uma diferença média de aproximadament 0.4 e uma margem de erro de aproximadamente 0.3 para mais ou 0.4 para menos, havendo a possibilidade de não a diferença entre as duas não existir.
 
 ```{r}
 ci_updown = boot(data = dados_wide$updown_baseline,
@@ -156,7 +157,9 @@ ci_updown %>%
         coord_flip()
 ```
 
-Com 95% de confiança a estratégia up/downvotings pode ter maior satisfação em relação à estratégia baseline, com uma diferença média de 2.25 e com um margem de erro de aproximadamente 0.3 para mais e para menos.
+Num intervalo de 95% de confiança a estratégia Up/downvotings tem maior satisfação em relação à estratégia Baseline, com uma diferença média de 2.3 e com um margem de erro de aproximadamente 0.3 para mais ou para menos.
+
+Analisando a comparação das outras estratégias com a Baseline, a Up/downvotings parece ser a que mais leva vantagem, pois possui a maior diferença e uma margem de erro pequena.
 
 ```{r}
 ci_updown_combined = boot(data = dados_wide$updown_combined,
@@ -185,34 +188,7 @@ ci_updown_combined %>%
         coord_flip()
 ```
 
-```{r}
-ci_updown = boot(data = dados_wide$updown_baseline,
-                   statistic = theta,
-                   R = 2000) %>%
-    tidy(conf.level = .95,
-         conf.method = "bca",
-         conf.int = TRUE)
-
-ci_updown
-```
-
-
-```{r}
-ci_updown %>% 
-  ggplot(aes(
-            ymin = conf.low,
-            y = statistic,
-            ymax = conf.high,
-            x = "Up/downvoting - Baseline"
-        )) +
-        geom_linerange() +
-        geom_point(color = "coral", size = 2) +
-        scale_y_continuous(limits = c(0, 5)) +
-        labs(x = "", y = "Média da diferenças de satisfação") +
-        coord_flip()
-```
-
-Com 95% de confiança a estratégia up/downvotings pode ter maior satisfação em relação à estratégia baseline, com uma diferença média de 2.25 e com um margem de erro de aproximadamente 0.3 para mais e para menos.
+Num intervalo de 95% de confiança a estratégia Up/downvotings parece ter maior satisfação em relação à estratégia Combined, com uma diferença média de 0.4 e com um margem de erro de aproximadamente 0.4 para mais ou para menos, podendo não haver nenhuma diferença de satisfação entre elas.
 
 ```{r}
 ci_skip_combined = boot(data = dados_wide$combined_skip,
@@ -225,14 +201,13 @@ ci_skip_combined = boot(data = dados_wide$combined_skip,
 ci_skip_combined
 ```
 
-
 ```{r}
 ci_skip_combined %>% 
   ggplot(aes(
             ymin = conf.low,
             y = statistic,
             ymax = conf.high,
-            x = "Skip - Combined"
+            x = "Combined - Skip"
         )) +
         geom_linerange() +
         geom_point(color = "coral", size = 2) +
@@ -240,6 +215,8 @@ ci_skip_combined %>%
         labs(x = "", y = "Média da diferenças de satisfação") +
         coord_flip()
 ```
+
+Num intervalo de 95% de confiança a estratégia Combined tem maior satisfação em relação à estratégia Skip, com uma diferença média de 1.5 e com um margem de erro de aproximadamente 0.4 para mais ou 0.3 para menos.
 
 ```{r}
 ci_skip_updown = boot(data = dados_wide$updown_skip,
@@ -259,7 +236,7 @@ ci_skip_updown %>%
             ymin = conf.low,
             y = statistic,
             ymax = conf.high,
-            x = "Skip - Combined"
+            x = "Up/downvoting - Skip"
         )) +
         geom_linerange() +
         geom_point(color = "coral", size = 2) +
@@ -267,3 +244,7 @@ ci_skip_updown %>%
         labs(x = "", y = "Média da diferenças de satisfação") +
         coord_flip()
 ```
+
+Num intervalo de 95% de confiança a estratégia Up/downvotings tem maior satisfação em relação à estratégia Skip, com uma diferença média de 1.4 e com um margem de erro de aproximadamente 0.3 para mais ou para menos. Sendo assim, podemos considerar que uso da estratégia Up/downvoting provavelmente terá mais eficácia no aumento da satisfações dos usuários.
+
+Através das análises feitas podemos concluir que no geral a estrátégia Up/downvoting traz melhores resultados, mas se não for possível implementá-la, a estratégia Combined é uma boa opção, trazendo um nível de satisfação melhor que a Baseline e a Skip.
